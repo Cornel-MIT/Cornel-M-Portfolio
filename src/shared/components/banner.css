@@ -1,0 +1,40 @@
+.banner.sunken {
+  position: relative; isolation: isolate; overflow: hidden; min-height: 190px;
+  display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem;
+  background-color: var(--c-200);
+  background-image:
+    linear-gradient(90deg, rgba(8, 8, 24, .76), rgba(8, 8, 24, .4) 48%, rgba(8, 8, 24, .08)),
+    url('/images/Neon-Outrun-Delorean.png');
+  background-position: center, center 76%;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.banner__grid {
+  position: absolute; left: -10%; right: -10%; bottom: -30px; height: 70px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--bronze) 35%, transparent) 1px, transparent 1px) 0 0 / 36px 100%,
+    linear-gradient(color-mix(in srgb, var(--bronze) 35%, transparent) 1px, transparent 1px) 0 0 / 100% 14px;
+  transform: perspective(160px) rotateX(55deg); transform-origin: bottom;
+}
+.banner--headphones::after {
+  position: absolute; inset: 0 auto 0 0; z-index: 0; width: min(42%, 480px);
+  content: ''; pointer-events: none; opacity: .82;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 68%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 68%, transparent 100%);
+  background-image: linear-gradient(90deg, rgba(8, 8, 24, .12), transparent 34%), url('/images/Retro-Headphones.jpg');
+  background-position: center, center 52%; background-size: 100% 100%, auto 245%; background-repeat: no-repeat;
+}
+.banner__mascot { position: relative; z-index: 1; font-size: 3.2rem; filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, .45)); }
+.banner__text { position: relative; z-index: 1; }
+.banner--headphones .banner__text { margin-left: clamp(170px, 42%, 480px); }
+.banner h1 {
+  font-size: clamp(1.8rem, 5vw, 3rem); color: var(--title-ink); line-height: 1.05;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, .8);
+}
+.banner p { margin: .4rem 0 0; color: #fff3fa; font-weight: 500; text-shadow: 0 1px 4px rgba(0, 0, 0, .9); }
+@media (max-width: 600px) {
+  .banner.sunken { min-height: 165px; background-position: center, 66% 76%; }
+  .banner__mascot { font-size: 2.7rem; }
+  .banner--headphones::after { width: 42%; opacity: .55; background-size: 100% 100%, auto 230%; }
+  .banner--headphones .banner__text { margin-left: 42%; }
+}

@@ -1,0 +1,21 @@
+.project__cover { display: grid; place-items: center; height: 120px; font-size: 3.4rem; margin-bottom: .7rem;
+  background: linear-gradient(135deg, var(--rose), var(--c-200) 55%, var(--mist)); }
+.project__cover--image { overflow: hidden; grid-template-rows: minmax(0, 1fr); background: #10111a; }
+.project__cover--image img { display: block; min-width: 0; min-height: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+.project__status { align-self: flex-start; margin-bottom: .45rem; padding: .15rem .45rem; color: var(--sage-deep); background: color-mix(in srgb, var(--sage) 30%, var(--c-50)); border: 1px solid var(--sage-deep); font: 700 .68rem var(--font-display); }
+.project__status.is-in-progress { color: var(--bronze-dark); background: color-mix(in srgb, var(--rose) 32%, var(--c-50)); border-color: var(--bronze); }
+.project__screenshots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .45rem; margin-top: .75rem; }
+.project__screenshots figure { min-width: 0; overflow: hidden; background: var(--c-100); border: 1px solid var(--bevel-dark); }
+.project__screenshots img { display: block; width: 100%; height: min(54vh, 460px); min-height: 260px; object-fit: contain; background: #11121a; }
+.project__screenshots figcaption { padding: .25rem .2rem; color: var(--ink-soft); font-size: .68rem; text-align: center; }
+.project__stack { display: flex; flex-wrap: wrap; gap: .3rem; margin: .4rem 0 .8rem; }
+.project__actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.project .window__body { display: flex; flex-direction: column; }
+.project__actions { margin-top: auto; }
+.modal { position: fixed; inset: 0; background: rgba(67, 52, 42, .45); display: grid; place-items: center; padding: 1rem; z-index: 10; }
+.modal > div { width: min(960px, 100%); max-height: calc(100dvh - 2rem); overflow-y: auto; }
+@media (max-width: 600px) {
+  .project__screenshots { grid-template-columns: repeat(3, minmax(140px, 1fr)); gap: .3rem; overflow-x: auto; }
+  .project__screenshots img { height: min(42vh, 360px); min-height: 220px; }
+  .project__screenshots figcaption { font-size: .62rem; }
+}

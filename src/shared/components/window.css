@@ -1,0 +1,19 @@
+.window {
+  background: var(--c-50);
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-dark) var(--bevel-dark) var(--bevel-light);
+  box-shadow: var(--shadow-hard);
+  display: flex; flex-direction: column; min-width: 0;
+}
+.window__bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(90deg, var(--bronze-dark), var(--bronze) 70%, var(--bronze-dark));
+  color: var(--title-ink); padding: .2rem .5rem;
+}
+.window__title { font-size: 1rem; font-weight: 500; letter-spacing: .02em; }
+.window__close {
+  font: 700 1rem/1 var(--font-body); width: 1.4rem; height: 1.4rem; padding: 0;
+  background: var(--c-100); color: var(--ink); cursor: pointer;
+  border: 2px solid; border-color: var(--bevel-light) var(--bevel-dark) var(--bevel-dark) var(--bevel-light);
+}
+.window__body { padding: .9rem; flex: 1; }

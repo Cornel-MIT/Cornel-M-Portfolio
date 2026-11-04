@@ -1,0 +1,56 @@
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { min-height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  line-height: 1.5;
+  background-color: var(--c-200);
+  background-image: radial-gradient(var(--c-300) 1.2px, transparent 1.2px);
+  background-size: 16px 16px;
+}
+h1, h2, h3 { font-family: var(--font-display); margin: 0; font-weight: 600; }
+p { margin: 0 0 .6rem; }
+a { color: inherit; }
+ul { margin: 0; padding: 0; list-style: none; }
+:focus-visible { outline: 3px solid var(--rose-deep); outline-offset: 2px; }
+
+/* ---- Retro primitives ---- */
+.raised {
+  background: var(--c-100);
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-dark) var(--bevel-dark) var(--bevel-light);
+}
+.sunken {
+  background: var(--c-50);
+  border: 2px solid;
+  border-color: var(--bevel-dark) var(--bevel-light) var(--bevel-light) var(--bevel-dark);
+}
+.btn {
+  font: 600 .9rem var(--font-body);
+  color: var(--ink);
+  background: var(--c-100);
+  padding: .45rem .9rem;
+  display: inline-flex; align-items: center; gap: .4rem; justify-content: center;
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-dark) var(--bevel-dark) var(--bevel-light);
+  cursor: pointer; text-decoration: none;
+}
+.btn:hover { background: var(--c-50); }
+.btn:active { border-color: var(--bevel-dark) var(--bevel-light) var(--bevel-light) var(--bevel-dark); }
+.btn--primary { background: var(--bronze); color: var(--c-50); border-color: var(--bevel-light) var(--bronze-dark) var(--bronze-dark) var(--bevel-light); }
+.btn--primary:hover { background: var(--bronze-dark); }
+
+.chip {
+  display: inline-block; font-size: .78rem; font-weight: 500;
+  padding: .1rem .5rem; background: var(--c-200); border: 1px solid var(--c-400);
+}
+
+.page { display: grid; gap: 1rem; }
+.grid-2 { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-3 { display: grid; gap: 1rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

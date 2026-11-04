@@ -1,0 +1,25 @@
+.about__bio { display: grid; grid-template-columns: minmax(145px, 180px) minmax(0, 1fr); gap: 1rem; align-items: start; }
+.about__polaroid { width: 100%; padding: 8px 8px 22px; background: var(--c-50); transform: rotate(-3deg); box-shadow: var(--shadow-hard); }
+.about__portrait { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.about__sign { font-family: var(--font-display); color: var(--rose-deep); font-size: 1.2rem; text-align: right; }
+.about__timeline { list-style: none; margin: 0; padding: 0 0 0 1rem; border-left: 3px solid var(--c-400); display: grid; gap: .55rem; }
+.about__timeline li { position: relative; }
+.about__timeline li::before {
+  content: ''; position: absolute; left: calc(-1rem - 7px); top: .4rem; width: 11px; height: 11px;
+  background: var(--rose); border: 2px solid var(--bronze);
+}
+.about__timeline strong { font-family: var(--font-display); color: var(--bronze); margin-right: .4rem; }
+.about__journey-start { margin-top: .75rem; }
+.about__goals, .about__loves { display: grid; gap: .55rem; }
+.about__goals li::first-letter { color: var(--sage-deep); }
+.about__experience { display: grid; gap: 1rem; }
+.about__experience > li { padding-bottom: .85rem; border-bottom: 1px dashed var(--c-300); }
+.about__experience > li:last-child { padding-bottom: 0; border-bottom: 0; }
+.about__experience h3 { margin-bottom: .25rem; color: var(--bronze-dark); }
+.about__experience p { margin-bottom: .35rem; }
+.about__experience-period { color: var(--ink-soft); font-size: .85rem; }
+.about__experience ul { display: grid; gap: .3rem; padding-left: 1.15rem; list-style: disc; }
+@media (max-width: 600px) {
+  .about__bio { grid-template-columns: 1fr; }
+  .about__polaroid { max-width: 200px; justify-self: center; }
+}

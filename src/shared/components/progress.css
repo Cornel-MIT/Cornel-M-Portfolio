@@ -1,0 +1,7 @@
+.progress { height: 14px; padding: 1px; }
+.progress__fill {
+  height: 100%;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 6px, rgba(255, 250, 241, .7) 6px 8px),
+    linear-gradient(90deg, var(--bronze), var(--c-400) 60%, var(--rose));
+}

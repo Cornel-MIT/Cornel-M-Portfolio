@@ -1,0 +1,16 @@
+.dash__stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .8rem; }
+.stat { display: grid; justify-items: center; gap: .1rem; padding: .8rem .5rem; text-align: center; font-size: .88rem; box-shadow: var(--shadow-hard); }
+.stat__icon { font-size: 1.5rem; }
+.stat__value { font-family: var(--font-display); font-size: 1.9rem; color: var(--bronze-dark); line-height: 1.1; }
+.dash__skills { display: grid; gap: .6rem; margin-bottom: .9rem; }
+.dash__skills li { display: flex; justify-content: space-between; gap: .6rem; align-items: center; padding-bottom: .35rem; border-bottom: 1px dashed var(--c-300); font-size: .92rem; }
+.dash__skill-tag { color: var(--bronze); font: 700 .62rem var(--font-display); text-transform: uppercase; }
+.dash__project .project__cover { height: 140px; font-size: 2.6rem; background: linear-gradient(135deg, var(--rose), var(--c-200) 55%, var(--mist)); display: grid; place-items: center; margin-bottom: .6rem; }
+.dash__project h3 { font-size: 1.3rem; color: var(--bronze-dark); }
+.dash__journey { display: grid; gap: .5rem; margin-bottom: .9rem; }
+.dash__journey strong { font-family: var(--font-display); color: var(--bronze); margin-right: .4rem; }
+.clock { padding: .8rem; text-align: center; margin-bottom: .9rem; }
+.clock__time { font-family: var(--font-display); font-size: 2.6rem; color: var(--bronze-dark); line-height: 1; }
+.clock__status { margin-top: .4rem; color: var(--sage-deep); font-weight: 600; font-size: .9rem; }
+.dash__cta { width: 100%; }
+@media (max-width: 700px) { .dash__stats { grid-template-columns: repeat(2, 1fr); } }
