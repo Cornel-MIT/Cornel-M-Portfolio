@@ -59,7 +59,7 @@ export default function AppShell() {
   const [draftPreferences, setDraftPreferences] = useState(preferences)
   const musicRef = useRef(null)
   const musicEnabled = settingsOpen ? draftPreferences.musicEnabled : preferences.musicEnabled
-  const [windowOpen, setWindowOpen] = useState(false)
+  const [windowOpen, setWindowOpen] = useState(true)
   const [windowMinimized, setWindowMinimized] = useState(false)
   const [journeyOpen, setJourneyOpen] = useState(false)
   const [onePageOpen, setOnePageOpen] = useState(false)
