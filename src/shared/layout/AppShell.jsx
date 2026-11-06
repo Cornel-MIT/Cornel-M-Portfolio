@@ -9,6 +9,15 @@ import Taskbar from './Taskbar.jsx'
 import './shell.css'
 
 const PREFERENCES_KEY = 'sam-portfolio-preferences'
+const HINTS_SEEN_KEY = 'sam-portfolio-hints-seen'
+
+function readFirstVisit() {
+  try {
+    return localStorage.getItem(HINTS_SEEN_KEY) !== 'true'
+  } catch {
+    return true
+  }
+}
 
 function readPreferences() {
   try {
@@ -58,21 +67,39 @@ export default function AppShell() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [draftPreferences, setDraftPreferences] = useState(preferences)
   const musicRef = useRef(null)
+  const previousPaletteRef = useRef(preferences.palette)
   const musicEnabled = settingsOpen ? draftPreferences.musicEnabled : preferences.musicEnabled
+  const [volume, setVolume] = useState(42)
   const [windowOpen, setWindowOpen] = useState(true)
   const [windowMinimized, setWindowMinimized] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
   const [journeyOpen, setJourneyOpen] = useState(false)
   const [onePageOpen, setOnePageOpen] = useState(false)
   const windowVisible = windowOpen && !windowMinimized
   const [booting, setBooting] = useState(true)
+  const [firstVisit, setFirstVisit] = useState(readFirstVisit)
+  const [bootReady, setBootReady] = useState(false)
   const [bootMessage] = useState(() => {
     const navigation = window.performance.getEntriesByType('navigation')[0]
     return navigation?.type === 'reload' ? 'Now Rebooting System...' : 'Welcome back Cornel'
   })
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setBooting(false), 900)
+    const timer = window.setTimeout(() => {
+      if (firstVisit) {
+        setBootReady(true)
+      } else {
+        setBooting(false)
+      }
+    }, 900)
     return () => window.clearTimeout(timer)
+  }, [firstVisit])
+
+  useEffect(() => {
+    const syncFullscreen = () => setIsFullscreen(document.fullscreenElement === document.documentElement)
+    document.addEventListener('fullscreenchange', syncFullscreen)
+    syncFullscreen()
+    return () => document.removeEventListener('fullscreenchange', syncFullscreen)
   }, [])
 
   useEffect(() => {
@@ -91,7 +118,7 @@ export default function AppShell() {
   useEffect(() => {
     const audio = new Audio('/audio/vukani-msaki.mp3')
     audio.loop = true
-    audio.volume = 0.35
+    audio.volume = volume / 100
     musicRef.current = audio
 
     return () => {
@@ -101,6 +128,10 @@ export default function AppShell() {
       musicRef.current = null
     }
   }, [])
+
+  useEffect(() => {
+    if (musicRef.current) musicRef.current.volume = volume / 100
+  }, [volume])
 
   useEffect(() => {
     const audio = musicRef.current
@@ -161,6 +192,38 @@ export default function AppShell() {
     setSettingsOpen(false)
   }
 
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => {})
+    } else {
+      void document.documentElement.requestFullscreen().catch(() => {})
+    }
+  }
+
+  const toggleDarkMode = () => {
+    setPreferences((currentPreferences) => {
+      if (currentPreferences.palette === 'dark') {
+        return {
+          ...currentPreferences,
+          palette: previousPaletteRef.current === 'dark' ? DEFAULT_PREFERENCES.palette : previousPaletteRef.current,
+        }
+      }
+
+      previousPaletteRef.current = currentPreferences.palette
+      return { ...currentPreferences, palette: 'dark' }
+    })
+  }
+
+  const dismissFirstVisitHints = () => {
+    try {
+      localStorage.setItem(HINTS_SEEN_KEY, 'true')
+    } catch {
+      // The welcome can still be dismissed when storage is unavailable.
+    }
+    setFirstVisit(false)
+    setBooting(false)
+  }
+
   const closePortfolio = () => {
     setWindowOpen(false)
     setWindowMinimized(false)
@@ -197,7 +260,14 @@ export default function AppShell() {
             <span>🖥️ Cornel's - {current.title}</span>
             <span className="shell__controls">
               <button type="button" title="Minimize window" aria-label="Minimize portfolio window" onClick={minimizePortfolio}>_</button>
-              <i aria-hidden="true">□</i>
+              <button
+                type="button"
+                title={isFullscreen ? 'Exit full screen' : 'Enter full screen'}
+                aria-label={isFullscreen ? 'Exit full screen' : 'Enter full screen'}
+                aria-pressed={isFullscreen}
+                disabled={!document.documentElement.requestFullscreen || !document.exitFullscreen}
+                onClick={toggleFullscreen}
+              >{isFullscreen ? '❐' : '□'}</button>
               <button type="button" title="Close window" aria-label="Close portfolio window" onClick={closePortfolio}>×</button>
             </span>
           </header>
@@ -253,18 +323,64 @@ export default function AppShell() {
       <Taskbar
         onOpenPortfolio={openPortfolio}
         onOpenOnePage={openOnePage}
+        onOpenSettings={openSettings}
         windowVisible={windowVisible}
         onePageOpen={onePageOpen}
+        inert={booting ? '' : undefined}
+        volume={volume}
+        onVolumeChange={setVolume}
+        musicEnabled={musicEnabled}
+        onToggleMusic={() => setPreferences((currentPreferences) => ({ ...currentPreferences, musicEnabled: !currentPreferences.musicEnabled }))}
+        darkMode={preferences.palette === 'dark'}
+        onToggleDarkMode={toggleDarkMode}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={toggleFullscreen}
+        onShowDesktop={minimizePortfolio}
       />
       {booting && (
-        <div className="boot-screen" role="status" aria-live="polite">
-          <div className="boot-screen__panel">
-            <span className="boot-screen__icon" aria-hidden="true">▣</span>
-            <p className="boot-screen__eyebrow">Cornel Masuku Portfolio</p>
-            <h1>{bootMessage}</h1>
-            <p className="boot-screen__status">Preparing your workspace...</p>
-            <div className="boot-screen__progress" aria-hidden="true"><span /></div>
-          </div>
+        <div
+          className={`boot-screen${bootReady ? ' boot-screen--hints' : ''}`}
+          role={bootReady ? 'dialog' : 'status'}
+          aria-live={bootReady ? undefined : 'polite'}
+          aria-modal={bootReady ? 'true' : undefined}
+          aria-labelledby={bootReady ? 'welcome-title' : undefined}
+        >
+          {bootReady ? (
+            <section className="boot-screen__panel boot-screen__panel--welcome">
+              <span className="boot-screen__icon" aria-hidden="true">▣</span>
+              <p className="boot-screen__eyebrow">Cornel Masuku Portfolio</p>
+              <h1 id="welcome-title">Welcome to my portfolio</h1>
+              <p className="boot-screen__status">A few pointers before you explore.</p>
+              <div className="welcome-hints">
+                <article className="welcome-hint">
+                  <span className="welcome-hint__number">01</span>
+                  <h2>Get to know me</h2>
+                  <p>Visit About Me for my background, experience, and the story behind my work.</p>
+                </article>
+                <article className="welcome-hint">
+                  <span className="welcome-hint__number">02</span>
+                  <h2>Find your way around</h2>
+                  <p>Use the left-side menu to browse sections, or search for a page from the taskbar.</p>
+                </article>
+                <article className="welcome-hint">
+                  <span className="welcome-hint__number">03</span>
+                  <h2>Go full screen</h2>
+                  <p>For the best view, select the square in the title bar. Press Esc to exit full screen.</p>
+                </article>
+              </div>
+              <button className="welcome-hints__start" type="button" autoFocus onClick={dismissFirstVisitHints}>
+                Explore portfolio <span aria-hidden="true">→</span>
+              </button>
+            </section>
+          ) : (
+            <div className="boot-screen__panel">
+              <span className="boot-screen__icon" aria-hidden="true">▣</span>
+              <p className="boot-screen__eyebrow">Cornel Masuku Portfolio</p>
+              <h1>{bootMessage}</h1>
+              <p className="boot-screen__status">Preparing your workspace...</p>
+              <div className="boot-screen__progress" aria-hidden="true"><span /></div>
+            </div>
+          )}
         </div>
       )}
     </>
