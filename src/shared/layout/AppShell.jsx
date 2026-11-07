@@ -10,6 +10,26 @@ import './shell.css'
 
 const PREFERENCES_KEY = 'sam-portfolio-preferences'
 const HINTS_SEEN_KEY = 'sam-portfolio-hints-seen'
+const welcomeHints = [
+  {
+    number: '01',
+    title: 'Get to know me',
+    description: 'Visit About Me for my background, experience, and the story behind my work.',
+    image: '/images/Gemini_Generated_Image_hms2r9hms2r9hms2.jpg',
+  },
+  {
+    number: '02',
+    title: 'Find your way around',
+    description: 'Use the left-side menu to browse sections, or search for a page from the taskbar.',
+    image: '/images/Gemini_Generated_Image_vcpd3lvcpd3lvcpd.jpg',
+  },
+  {
+    number: '03',
+    title: 'Go full screen',
+    description: 'For the best view, select the square in the title bar. Press Esc to exit full screen.',
+    image: '/images/Gemini_Generated_Image_rimm8hrimm8hrimm.jpg',
+  },
+]
 
 function readFirstVisit() {
   try {
@@ -79,6 +99,9 @@ export default function AppShell() {
   const [booting, setBooting] = useState(true)
   const [firstVisit, setFirstVisit] = useState(readFirstVisit)
   const [bootReady, setBootReady] = useState(false)
+  const [activeHintIndex, setActiveHintIndex] = useState(0)
+  const hintCardRefs = useRef([])
+  const previousHintIndex = useRef(activeHintIndex)
   const [bootMessage] = useState(() => {
     const navigation = window.performance.getEntriesByType('navigation')[0]
     return navigation?.type === 'reload' ? 'Now Rebooting System...' : 'Welcome back Cornel'
@@ -94,6 +117,13 @@ export default function AppShell() {
     }, 900)
     return () => window.clearTimeout(timer)
   }, [firstVisit])
+
+  useEffect(() => {
+    if (previousHintIndex.current !== activeHintIndex) {
+      hintCardRefs.current[activeHintIndex]?.focus()
+      previousHintIndex.current = activeHintIndex
+    }
+  }, [activeHintIndex])
 
   useEffect(() => {
     const syncFullscreen = () => setIsFullscreen(document.fullscreenElement === document.documentElement)
@@ -224,6 +254,16 @@ export default function AppShell() {
     setBooting(false)
   }
 
+  const chooseWelcomeMode = (fullscreen) => {
+    if (fullscreen && !document.fullscreenElement && document.documentElement.requestFullscreen) {
+      void document.documentElement.requestFullscreen().catch(() => {})
+    } else if (!fullscreen && document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => {})
+    }
+    minimizePortfolio()
+    dismissFirstVisitHints()
+  }
+
   const closePortfolio = () => {
     setWindowOpen(false)
     setWindowMinimized(false)
@@ -347,30 +387,70 @@ export default function AppShell() {
         >
           {bootReady ? (
             <section className="boot-screen__panel boot-screen__panel--welcome">
-              <span className="boot-screen__icon" aria-hidden="true">▣</span>
-              <p className="boot-screen__eyebrow">Cornel Masuku Portfolio</p>
               <h1 id="welcome-title">Welcome to my portfolio</h1>
               <p className="boot-screen__status">A few pointers before you explore.</p>
-              <div className="welcome-hints">
-                <article className="welcome-hint">
-                  <span className="welcome-hint__number">01</span>
-                  <h2>Get to know me</h2>
-                  <p>Visit About Me for my background, experience, and the story behind my work.</p>
-                </article>
-                <article className="welcome-hint">
-                  <span className="welcome-hint__number">02</span>
-                  <h2>Find your way around</h2>
-                  <p>Use the left-side menu to browse sections, or search for a page from the taskbar.</p>
-                </article>
-                <article className="welcome-hint">
-                  <span className="welcome-hint__number">03</span>
-                  <h2>Go full screen</h2>
-                  <p>For the best view, select the square in the title bar. Press Esc to exit full screen.</p>
-                </article>
+              <div className="welcome-hints" role="group" aria-label="Portfolio tips">
+                {welcomeHints.map((hint, index) => {
+                  const distance = index - activeHintIndex
+                  const isActive = distance === 0
+                  const isLastHint = index === welcomeHints.length - 1
+                  const advanceHint = () => setActiveHintIndex((currentIndex) => Math.min(currentIndex + 1, welcomeHints.length - 1))
+
+                  return (
+                    <article
+                      key={hint.number}
+                      ref={(element) => { hintCardRefs.current[index] = element }}
+                      className={`welcome-hint${hint.image ? ' welcome-hint--profile' : ''}${isActive ? ' is-active' : distance > 0 ? ' is-upcoming' : ' is-past'}`}
+                      style={{ '--stack-depth': Math.max(1, distance) }}
+                      role="button"
+                      tabIndex={isActive ? 0 : -1}
+                      autoFocus={index === 0}
+                      aria-hidden={!isActive}
+                      aria-disabled={isActive && isLastHint}
+                      aria-label={`${hint.number}. ${hint.title}. ${hint.description}${index < 2 ? ' Tap to Continue.' : ''}`}
+                      onClick={isLastHint && isActive ? undefined : advanceHint}
+                      onKeyDown={(event) => {
+                        if (!isLastHint && (event.key === 'Enter' || event.key === ' ')) {
+                          event.preventDefault()
+                          advanceHint()
+                        }
+                      }}
+                    >
+                      {hint.image && (
+                        <img
+                          className="welcome-hint__portrait"
+                          src={hint.image}
+                          alt=""
+                          aria-hidden="true"
+                        />
+                      )}
+                      <span className="welcome-hint__number">{hint.number}</span>
+                      <h2>{hint.title}</h2>
+                      <p>{hint.description}</p>
+                      {index < 2 && <span className="welcome-hint__continue">Tap to Continue <span aria-hidden="true">→</span></span>}
+                    </article>
+                  )
+                })}
               </div>
-              <button className="welcome-hints__start" type="button" autoFocus onClick={dismissFirstVisitHints}>
-                Explore portfolio <span aria-hidden="true">→</span>
-              </button>
+              {activeHintIndex === welcomeHints.length - 1 && (
+                <div className="welcome-hints__actions">
+                  <button
+                    className="welcome-hints__mode welcome-hints__mode--fullscreen"
+                    type="button"
+                    disabled={!document.documentElement.requestFullscreen}
+                    onClick={() => chooseWelcomeMode(true)}
+                  >
+                    <span aria-hidden="true">□</span> View in full screen
+                  </button>
+                  <button
+                    className="welcome-hints__mode welcome-hints__mode--normal"
+                    type="button"
+                    onClick={() => chooseWelcomeMode(false)}
+                  >
+                    <span aria-hidden="true">▣</span> View in normal mode
+                  </button>
+                </div>
+              )}
             </section>
           ) : (
             <div className="boot-screen__panel">
